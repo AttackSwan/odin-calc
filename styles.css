@@ -22,11 +22,27 @@ body {
     box-shadow: rgba(0, 0, 0, 0.25) 54px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;}
 
 .screen{
+    font-family: 'Press Start 2P', cursive;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: 1;
+    justify-content: space-between;
+    align-items: end;
     background-color: darkgray;
     border-radius: 16px;
-    height: 100px;
+    min-height: 100px;
+    width: 268px;
     margin-bottom: 16px;
     box-shadow: rgb(0, 0, 0) 3px 3px 6px 0px inset, rgba(255, 255, 255, 0.5) -3px -3px 6px 1px inset;
+    padding: 16px;
+}
+
+#upperTXT{
+    font-size: 20px;
+}
+#lowerTXT{
+    font-size: 40px;
+    text-align: end;
 }
 
 .buttons{
