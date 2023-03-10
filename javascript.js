@@ -6,6 +6,7 @@ let lastOperator    = "";
 let lastType        = "";
 let waitForClear    = false;
 const operators     = "+-X÷";
+const decimalPlaces = 3;
 
 const clearButton   = document.getElementById("btnAC");
 const deleteButton  = document.getElementById("btnC");
@@ -21,19 +22,7 @@ equalsButton.onclick    = () => equals();
 
 createListeners();   //for numeric and operator buttons
 
-// console.log("LastOp: " + lastOperator + " | CV: " + currentVal + " | LV: " + lastVal + " | subTotal: " + subTotal)
 
-function decimal(){
-    if (!currentVal.includes(".")){
-        append(".");
-    }
-}
-
-function append(input){
-    currentVal += input;
-    displayVal += input;
-    updateDisplay("upper", displayVal);
-}
 
 function input(button){
     let buttonType = button.target.className;
@@ -85,9 +74,9 @@ function calculate(button){
 }
 
 function operate(operation, a, b){
-    a = parseInt(a);
-    b = parseInt(b);
-    let output = "ERROR";
+    a = parseFloat(a);
+    b = parseFloat(b);
+    let output = "";
     if (operation === "btnADD"){
         output = a + b;
     }
@@ -113,14 +102,36 @@ function operate(operation, a, b){
         subTotal = "Math Error";
         console.log("Error! Op: " + operation);
     }
+    output = parseOutput(output);    
     return output;
+}
+
+function parseOutput(output){
+    if (typeof(output) === "number"){
+        output = output.toFixed(decimalPlaces);
+    }
+    if (output % 1 === 0){
+        output = Math.round(output);
+    }
+    return output;
+}
+
+function decimal(){
+    if (!currentVal.includes(".")){
+        append(".");
+    }
+}
+
+function append(input){
+    currentVal += input;
+    displayVal += input;
+    updateDisplay("upper", displayVal);
 }
 
 function equals(){
     //If something has been entered and it isn't an operator
     if(currentVal && lastType !== "operator" && lastOperator !== "") 
     {  
-        console.log("Equals 1");
         subTotal = operate(lastOperator, lastVal, currentVal);
         console.log(subTotal);
         updateDisplay("lower", subTotal);
@@ -186,3 +197,7 @@ function createListeners(){
         }); 
     });
 }
+
+// console.log("LastOp: " + lastOperator + " | CV: " + currentVal + " | LV: " + lastVal + " | subTotal: " + subTotal)
+
+//Add glow to clear button when equals or div0
