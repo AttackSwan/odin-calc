@@ -20,7 +20,7 @@ equalsButton.onclick    = () => equals();
 
 createListeners();   //for numeric and operator buttons
 
-console.log("LastOp: " + lastOperator + " | CV: " + currentVal + " | LV: " + lastVal)
+// console.log("LastOp: " + lastOperator + " | CV: " + currentVal + " | LV: " + lastVal + " | subTotal: " + subTotal)
 
 function input(button){
     let buttonType = button.target.className;
@@ -29,33 +29,48 @@ function input(button){
     if(buttonType === "numeric" && !waitForClear){
         currentVal +=buttonText;
         displayVal +=buttonText;
+        updateDisplay("upper", displayVal);
     }
-   
-    else if(buttonType === "operator" && !waitForClear){
+    else if(buttonType === "operator"){
+        calculate(button);
+    }
+    console.log("current: " + currentVal + " | last: " + lastVal + " | Last op: " + lastOperator + " | subTotal: " + subTotal);           
+    lastType = buttonType;
+}
+
+function calculate(button){
+        //Starting with an operator
+        if(!lastType){
+            lastVal = 0;
+            displayVal = 0 + button.target.innerText;
+            updateDisplay("upper", displayVal);
+        }
+        //Start with numeric
+        //First usage of operator
+        else if (!lastOperator) {
+            console.log("If 1");
+            displayVal += button.target.innerText;
+            updateDisplay("upper", displayVal);
+            lastType = "operator";
+            lastVal = currentVal;
+        }
+        //Prevent operators stacking up in upper display
+        else if (lastType === "operator" && !waitForClear){
+            console.log("Else if 2");
+            displayVal = displayVal.substring(0, displayVal.length-1) + button.target.innerText;
+            updateDisplay("upper", displayVal);
+        }
+        //Operate on previous pair of inputs
+        else if (lastOperator !== "" && !waitForClear){
+            console.log("Else if 3");
+            displayVal += button.target.innerText;
+            lastVal = subTotal = operate(lastOperator, lastVal, currentVal);
+            updateDisplay("upper", displayVal);
+            updateDisplay("lower", subTotal);
+        }
         
-        //Display: add operator to upper display
-        if (lastType === "operator"){
-            displayVal = displayVal.substring(0, displayVal.length-1);            
-        }
-        //Operate / Sub-total: (operator has previously been pressed)
-        else if (lastOperator !== ""){
-            lastVal = subTotal;
-            subTotal = operate(lastOperator, lastVal, currentVal);
-        }
-        //No sub-total: First press of operator
-        else {
-            lastOperator = button.target.id;
-            subTotal = displayVal;
-        }
-        //Shift currentVal to previous and update display
-        lastVal = currentVal;
-        displayVal += button.target.innerText;
         currentVal = "";
         lastOperator = button.target.id;
-    }
-    
-    lastType = buttonType;
-    updateDisplay();
 }
 
 function equals(){
@@ -83,9 +98,13 @@ function clear(mode){
 function deleteNum(){
         upperDisplay = upperDisplay.substring(0, upperDisplay.length -1);
 }
-function updateDisplay(){
-    upperDisplay.textContent = displayVal;
-    lowerDisplay.textContent = subTotal;
+function updateDisplay(display, value){
+    if(display === "lower"){
+        lowerDisplay.textContent = value;
+    }
+    else if (display === "upper"){
+        upperDisplay.textContent = value;
+    }
 }
 
 function operate(operation, a, b){
