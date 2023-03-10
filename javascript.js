@@ -73,40 +73,6 @@ function calculate(button){
         lastOperator = button.target.id;
 }
 
-function equals(){
-    if(currentVal){  //Only run if something has been entered
-    subTotal = operate(lastOperator, lastVal, currentVal);
-    if (displayVal !== "Div 0!") { clear("upper"); }
-    updateDisplay();
-    }
-}
-
-
-function clear(mode){
-    //Clear all
-    if (!mode){
-        subTotal = lastVal = 0;
-        waitForClear = false;
-    }
-    //Runs on equal button click
-    else if(mode==="upper"){
-        waitForClear = true;
-    }
-    displayVal = currentVal = lastOperator = lastType = "";
-    updateDisplay();
-}
-function deleteNum(){
-        upperDisplay = upperDisplay.substring(0, upperDisplay.length -1);
-}
-function updateDisplay(display, value){
-    if(display === "lower"){
-        lowerDisplay.textContent = value;
-    }
-    else if (display === "upper"){
-        upperDisplay.textContent = value;
-    }
-}
-
 function operate(operation, a, b){
     a = parseInt(a);
     b = parseInt(b);
@@ -121,9 +87,8 @@ function operate(operation, a, b){
         output = a * b;
     }
     else if(operation === "btnDIV"){
-        console.log(a + " " + b);
-        if(b !== 0)      {output = a / b;}
-        else if(b === 0) {
+        if(b !== 0) {output = a / b;}
+        else {
             divZero(); 
             output = "Infinity";
         }
@@ -139,6 +104,54 @@ function operate(operation, a, b){
     }
     return output;
 }
+
+function equals(){
+    //If something has been entered and it isn't an operator
+    if(currentVal && lastType !== "operator" && lastOperator !== "") 
+    {  
+        console.log("Equals 1");
+        subTotal = operate(lastOperator, lastVal, currentVal);
+        console.log(subTotal);
+        updateDisplay("lower", subTotal);
+        updateDisplay("upper", "");
+        waitForClear = true;
+    }
+    else if (lastOperator === "" && currentVal){
+        updateDisplay("upper", "ಠ_ಠ");
+        updateDisplay("lower", currentVal);
+        waitForClear = true;
+    }
+}
+
+function clear(mode){
+    //Clear all
+    if (!mode){
+        subTotal = lastVal = 0;
+        waitForClear = false;
+        updateDisplay("lower", 0);
+        updateDisplay("upper", "");
+    }
+    //Runs on equal button click
+    else if(mode==="upper"){
+        waitForClear = true;
+    }
+    displayVal = currentVal = lastOperator = lastType = "";
+
+}
+
+function deleteNum(){
+        upperDisplay = upperDisplay.substring(0, upperDisplay.length -1);
+}
+
+function updateDisplay(display, value){
+    if(display === "lower"){
+        lowerDisplay.textContent = value;
+    }
+    else if (display === "upper"){
+        upperDisplay.textContent = value;
+    }
+}
+
 
 function divZero(){
     displayVal = "Div 0!";
