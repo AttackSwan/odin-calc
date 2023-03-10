@@ -3,8 +3,9 @@ let currentVal      = "";
 let lastVal         = 0;
 let subTotal        = 0;
 let lastOperator    = "";
-let lastType        = "";   //?
+let lastType        = "";
 let waitForClear    = false;
+const operators     = "+-X÷";
 
 const clearButton   = document.getElementById("btnAC");
 const deleteButton  = document.getElementById("btnC");
@@ -15,20 +16,31 @@ const lowerDisplay = document.getElementById("lowerTXT");
 
 clearButton.onclick     = () => clear();
 deleteButton.onclick    = () => deleteNum();
-decimalButton  .onclick = () => decimalButton();
+decimalButton.onclick   = () => decimal();
 equalsButton.onclick    = () => equals();
 
 createListeners();   //for numeric and operator buttons
 
 // console.log("LastOp: " + lastOperator + " | CV: " + currentVal + " | LV: " + lastVal + " | subTotal: " + subTotal)
 
+function decimal(){
+    if (!currentVal.includes(".")){
+        append(".");
+    }
+}
+
+function append(input){
+    currentVal += input;
+    displayVal += input;
+    updateDisplay("upper", displayVal);
+}
+
 function input(button){
     let buttonType = button.target.className;
     let buttonText = button.target.innerText;
     
     if(buttonType === "numeric" && !waitForClear){
-        currentVal +=buttonText;
-        displayVal +=buttonText;
+        append(buttonText);
         updateDisplay("upper", displayVal);
     }
     else if(buttonType === "operator"){
@@ -140,14 +152,15 @@ function clear(mode){
 
 function deleteNum(){
     //Check if delete character is an operator
-    const operators = "+-X÷"
     const isOperator = operators.includes(displayVal.at(-1));
-    console.log(isOperator + " | " + displayVal.at(-1));
 
-    if(!waitForClear && !isOperator){
+    if(!waitForClear && !isOperator && displayVal){
         displayVal = displayVal.substring(0, displayVal.length -1);
         currentVal = currentVal.substring(0, currentVal.length -1);
         updateDisplay("upper", displayVal);
+    }
+    else if(!displayVal){
+        currentVal = 0;
     }    
 }
 
