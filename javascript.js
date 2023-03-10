@@ -39,13 +39,13 @@ function input(button){
 }
 
 function calculate(button){
-        //Starting with an operator
+        //If starting with an operator
         if(!lastType){
             lastVal = 0;
             displayVal = 0 + button.target.innerText;
             updateDisplay("upper", displayVal);
         }
-        //Start with numeric
+        //If starting with numeric
         //First usage of operator
         else if (!lastOperator) {
             console.log("If 1");
@@ -60,7 +60,7 @@ function calculate(button){
             displayVal = displayVal.substring(0, displayVal.length-1) + button.target.innerText;
             updateDisplay("upper", displayVal);
         }
-        //Operate on previous pair of inputs
+            //Operate on previous pair of inputs
         else if (lastOperator !== "" && !waitForClear){
             console.log("Else if 3");
             displayVal += button.target.innerText;
@@ -68,7 +68,6 @@ function calculate(button){
             updateDisplay("upper", displayVal);
             updateDisplay("lower", subTotal);
         }
-        
         currentVal = "";
         lastOperator = button.target.id;
 }
@@ -116,6 +115,7 @@ function equals(){
         updateDisplay("upper", "");
         waitForClear = true;
     }
+    //If running equals without any operators
     else if (lastOperator === "" && currentVal){
         updateDisplay("upper", "ಠ_ಠ");
         updateDisplay("lower", currentVal);
@@ -131,16 +131,24 @@ function clear(mode){
         updateDisplay("lower", 0);
         updateDisplay("upper", "");
     }
-    //Runs on equal button click
+    //Update upper display
     else if(mode==="upper"){
         waitForClear = true;
     }
     displayVal = currentVal = lastOperator = lastType = "";
-
 }
 
 function deleteNum(){
-        upperDisplay = upperDisplay.substring(0, upperDisplay.length -1);
+    //Check if delete character is an operator
+    const operators = "+-X÷"
+    const isOperator = operators.includes(displayVal.at(-1));
+    console.log(isOperator + " | " + displayVal.at(-1));
+
+    if(!waitForClear && !isOperator){
+        displayVal = displayVal.substring(0, displayVal.length -1);
+        currentVal = currentVal.substring(0, currentVal.length -1);
+        updateDisplay("upper", displayVal);
+    }    
 }
 
 function updateDisplay(display, value){
@@ -151,7 +159,6 @@ function updateDisplay(display, value){
         upperDisplay.textContent = value;
     }
 }
-
 
 function divZero(){
     displayVal = "Div 0!";
