@@ -22,20 +22,16 @@ equalsButton.onclick    = () => equals();
 
 createListeners();   //for numeric and operator buttons
 
-
-
 function input(button){
     let buttonType = button.target.className;
     let buttonText = button.target.innerText;
-    
+
     if(buttonType === "numeric" && !waitForClear){
         append(buttonText);
-        updateDisplay("upper", displayVal);
     }
     else if(buttonType === "operator"){
         calculate(button);
     }
-    console.log("current: " + currentVal + " | last: " + lastVal + " | Last op: " + lastOperator + " | subTotal: " + subTotal);           
     lastType = buttonType;
 }
 
@@ -64,10 +60,11 @@ function calculate(button){
             //Operate on previous pair of inputs
         else if (lastOperator !== "" && !waitForClear){
             console.log("Else if 3");
+            console.log("Last op: " + lastOperator + " | last val: " + lastVal + " | currentVal: " + currentVal);
             displayVal += button.target.innerText;
-            lastVal = subTotal = operate(lastOperator, lastVal, currentVal);
+            lastVal = subTotal = parseOutput(operate(lastOperator, lastVal, currentVal));
             updateDisplay("upper", displayVal);
-            updateDisplay("lower", subTotal);
+            updateDisplay("lower", parseOutput(subTotal));  //Don't round subTotal to avoid rounding errors
         }
         currentVal = "";
         lastOperator = button.target.id;
@@ -94,26 +91,24 @@ function operate(operation, a, b){
         }
     }
     else if(operation === "modulus"){
-        if( b===0 ) {output = a;}
-        else {output = a % b;}
+        b === 0 ? output = a : output = a % b;
     }
     else {  
         displayVal = "";
         subTotal = "Math Error";
         console.log("Error! Op: " + operation);
     }
-    output = parseOutput(output);    
     return output;
 }
 
-function parseOutput(output){
-    if (typeof(output) === "number"){
-        output = output.toFixed(decimalPlaces);
+function parseOutput(value){
+    if (typeof(value) === "number"){
+        value = value.toFixed(decimalPlaces);
     }
-    if (output % 1 === 0){
-        output = Math.round(output);
+    if (value % 1 === 0){
+        value = Math.round(value);
     }
-    return output;
+    return value;
 }
 
 function decimal(){
@@ -123,16 +118,24 @@ function decimal(){
 }
 
 function append(input){
+    let stringLength = currentVal.length;
     currentVal += input;
-    displayVal += input;
-    updateDisplay("upper", displayVal);
+    
+    if (stringLength >= 12){
+        let shortDisplay = displayVal.at(0) + "." + displayVal.substring(1,1) + "10e" + (stringLength - 1);
+        updateDisplay("upper", shortDisplay);
+    }
+    else {
+        displayVal += input;
+        updateDisplay("upper", displayVal);
+    }
 }
 
 function equals(){
     //If something has been entered and it isn't an operator
     if(currentVal && lastType !== "operator" && lastOperator !== "") 
     {  
-        subTotal = operate(lastOperator, lastVal, currentVal);
+        subTotal = parseOutput(operate(lastOperator, lastVal, currentVal));
         console.log(subTotal);
         updateDisplay("lower", subTotal);
         updateDisplay("upper", "");
@@ -172,7 +175,12 @@ function deleteNum(){
     }
     else if(!displayVal){
         currentVal = 0;
-    }    
+    }
+    //prevent returning NaN from operate()
+    if (currentVal === ""){
+        append(0); 
+        currentVal = 0;
+    }
 }
 
 function updateDisplay(display, value){
@@ -197,7 +205,4 @@ function createListeners(){
         }); 
     });
 }
-
-// console.log("LastOp: " + lastOperator + " | CV: " + currentVal + " | LV: " + lastVal + " | subTotal: " + subTotal)
-
 //Add glow to clear button when equals or div0
